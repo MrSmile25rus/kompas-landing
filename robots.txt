@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://kompas-vasilyanskaya.ru/sitemap.xml
+Sitemap: https://mrsmile25rus.github.io/kompas-landing/sitemap.xml

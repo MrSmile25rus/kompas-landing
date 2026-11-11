@@ -3,7 +3,7 @@
 
   var doc = document.documentElement;
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var SITE_URL = 'https://kompas-vasilyanskaya.ru/'; // TODO: реальный домен
+  var SITE_URL = 'https://mrsmile25rus.github.io/kompas-landing/'; // TODO: реальный домен
 
   /* =========================================================
      Аналитика (Яндекс.Метрика) — грузится только после согласия на cookie
