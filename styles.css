@@ -1007,3 +1007,150 @@ h2.sec-head__label { margin: 0; }
   .menu-open .burger span:first-child { transform: translate(-1px, 4px) rotate(45deg); }
   .menu-open .burger span:last-child { transform: translate(-1px, -4px) rotate(-45deg); }
 }
+
+/* =========================================================
+   v5 — заголовок, эпиграф, команда, темы ОВЗ, цены
+   ========================================================= */
+.hero__title span { display: block; }
+.hero__title span:nth-child(2) { color: var(--warm); }
+
+/* эпиграф */
+.epigraph { background: var(--paper); border-bottom: 1px solid var(--rule); }
+.epigraph__inner { display: grid; grid-template-columns: auto minmax(0, 860px); justify-content: center; gap: 28px; align-items: start; padding-block: clamp(48px, 7vw, 88px); }
+.epigraph__star { width: 22px; height: auto; margin-top: 10px; }
+.epigraph__quote p { font: italic 500 clamp(1.4rem, 2.6vw, 2.2rem)/1.35 var(--serif-text); color: var(--ink); text-wrap: balance; }
+.epigraph__quote footer { margin-top: 18px; font: 500 12px/1.4 var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--green-deep); }
+
+/* цитата Натальи */
+.quote__author { margin-top: 18px; font: 500 12px/1.4 var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--green-deep); }
+.about__img { object-position: 74% 40% !important; }
+.priorities strong { font-weight: 600; }
+
+/* команда */
+.sec-intro__text--light { color: rgba(255, 255, 255, .72); }
+.team__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.expert {
+  position: relative; display: flex; flex-direction: column; align-items: center; text-align: center;
+  padding: 40px 28px 32px; background: var(--graphite-deep); border: 1px solid var(--rule-light);
+  transition: border-color .3s var(--ease), transform .3s var(--ease);
+}
+.expert:hover { border-color: rgba(242, 212, 144, .45); }
+.expert__photo { position: relative; width: 168px; height: 168px; margin-bottom: 26px; }
+.expert__photo::before {
+  content: ""; position: absolute; inset: -9px; border-radius: 50%;
+  border: 1px solid rgba(242, 212, 144, .5);
+}
+.expert__photo::after {
+  content: ""; position: absolute; inset: -9px; border-radius: 50%;
+  border: 1px solid transparent; border-top-color: var(--warm);
+  transform: rotate(-30deg); transition: transform .8s var(--ease);
+}
+.expert:hover .expert__photo::after { transform: rotate(150deg); }
+.expert__photo picture, .expert__photo > picture img { display: block; width: 100%; height: 100%; border-radius: 50%; }
+.expert__photo img:not(.expert__badge) { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; transition: filter .5s var(--ease); }
+@media (hover: hover) {
+  .expert__photo img:not(.expert__badge) { filter: grayscale(1) contrast(1.05); }
+  .expert:hover .expert__photo img:not(.expert__badge) { filter: none; }
+}
+.expert__badge {
+  position: absolute; right: 2px; bottom: 6px; width: 38px; height: 38px; padding: 9px;
+  background: var(--graphite); border: 1px solid rgba(242, 212, 144, .5); border-radius: 50%;
+}
+.expert__name { font: 600 23px/1.2 var(--serif); color: var(--snow); text-wrap: balance; }
+.expert__role { margin-top: 10px; font-size: 14px; line-height: 1.5; color: var(--warm); }
+.expert__regalia { margin-top: 10px; font-size: 13px; line-height: 1.55; color: rgba(255, 255, 255, .6); }
+.expert__skills {
+  margin: 20px 0 0; padding-top: 18px; border-top: 1px solid var(--rule-light);
+  width: 100%; text-align: left; display: grid; gap: 9px; flex: 1; align-content: start;
+}
+.expert__skills li { position: relative; padding-left: 20px; font-size: 14px; line-height: 1.45; color: rgba(255, 255, 255, .86); }
+.expert__skills li::before {
+  content: ""; position: absolute; left: 0; top: .32em; width: 9px; height: 12px;
+  background: url("assets/main_star.svg") center / contain no-repeat;
+}
+.expert__cta {
+  margin-top: 24px; font-size: 14px; font-weight: 500; color: var(--snow);
+  border-bottom: 1px solid rgba(255, 255, 255, .35); padding-bottom: 3px;
+  transition: color .2s var(--ease), border-color .2s var(--ease);
+}
+.expert__cta::after { content: " →"; }
+.expert__cta:hover { color: var(--warm); border-color: var(--warm); }
+.expert--cta { justify-content: center; background: transparent; border-style: dashed; border-color: rgba(242, 212, 144, .35); }
+.expert__cta-icon { width: 64px; height: auto; margin-bottom: 24px; }
+.expert--cta .expert__regalia { margin: 12px 0 26px; font-size: 14px; max-width: 260px; }
+
+/* темы: кто ведёт */
+.topic__expert {
+  display: inline-block; margin-left: 6px; padding: 1px 9px; vertical-align: 1px;
+  font-size: 11px; font-weight: 500; letter-spacing: .04em; color: var(--green-deep);
+  border: 1px solid rgba(108, 127, 99, .35); border-radius: 20px; white-space: nowrap;
+}
+
+/* группы тем ОВЗ */
+.topic-groups { border-top: 1px solid var(--rule-strong); }
+.topic-group { border-bottom: 1px solid var(--rule); }
+.topic-group summary {
+  position: relative; display: flex; align-items: center; gap: 12px; list-style: none; cursor: pointer;
+  padding: 20px 40px 20px 0; font: 600 clamp(1.15rem, 1.6vw, 1.35rem)/1.3 var(--serif-text); color: var(--ink);
+}
+.topic-group summary::-webkit-details-marker { display: none; }
+.topic-group summary::before, .topic-group summary::after {
+  content: ""; position: absolute; right: 6px; top: 50%; width: 13px; height: 1.5px; background: var(--ink);
+  transition: transform .3s var(--ease);
+}
+.topic-group summary::after { transform: rotate(90deg); }
+.topic-group[open] summary::after { transform: rotate(0); }
+.topic-group summary:hover { color: var(--green-deep); }
+.topic-group__count {
+  flex: none; min-width: 26px; height: 22px; padding: 0 7px; display: grid; place-items: center;
+  font: 500 12px/1 var(--sans); color: var(--green-deep); background: rgba(126, 145, 117, .12); border-radius: 11px;
+}
+.topics--plain { border-top: 0; counter-reset: none; padding-bottom: 12px; }
+.topics--plain li { counter-increment: none; padding: 9px 0 9px 26px; border-bottom: 0; font-size: 15px; }
+.topics--plain li::before {
+  content: ""; top: 16px; width: 9px; height: 12px;
+  background: url("assets/star_green.svg") center / contain no-repeat;
+}
+
+/* анонсы: ведущий и цены */
+.event__expert { margin-top: 10px; font-size: 14px; color: var(--ink-soft); }
+.event__expert strong { color: var(--ink); font-weight: 600; }
+.event__tiers { margin-top: 10px; font-size: 13px; color: var(--green-deep); }
+.ev-group { padding: 16px 18px; background: var(--paper); border-left: 2px solid var(--green); display: grid; gap: 8px; }
+.ev-group .field input { max-width: 140px; }
+.ev-group__price { font-size: 15px; color: var(--ink-soft); }
+.ev-group__price strong { color: var(--ink); font-size: 17px; }
+.ev-group__tiers { font-size: 13px; color: var(--ink-mute); }
+.form--light .ev-group .field input { color: var(--ink); border-bottom-color: var(--rule-strong); }
+
+/* экспертные темы: 8 пунктов в 2 ряда */
+@media (min-width: 1101px) {
+  .expertise__list li:nth-child(4n+1) { padding-left: 0; border-left: 0; }
+  .expertise__list li:nth-child(n+5) { border-top: 1px solid var(--rule); margin-top: 24px; }
+}
+@media (max-width: 1100px) and (min-width: 641px) {
+  .expertise__list li:nth-child(odd) { padding-left: 0; border-left: 0; }
+  .expertise__list li:nth-child(even) { padding-left: 28px; border-left: 1px solid var(--rule); }
+  .expertise__list li:nth-child(n+3) { border-top: 1px solid var(--rule); margin-top: 24px; }
+}
+
+@media (max-width: 1100px) {
+  .team__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .team__grid { grid-template-columns: 1fr; gap: 16px; }
+  .expert { padding: 32px 20px 28px; }
+  .expert__photo { width: 144px; height: 144px; }
+  .epigraph__inner { grid-template-columns: 1fr; gap: 16px; }
+  .topic__expert { margin: 6px 0 0; display: table; }
+}
+
+/* заголовок из трёх фраз — каждая в свою строку */
+.hero__title { font-size: clamp(2rem, 3.5vw, 3.15rem); line-height: 1.08; }
+.hero__title span + span { margin-top: .08em; }
+@media (min-width: 1600px) { .hero__title { font-size: 3.6rem; } }
+@media (max-width: 1100px) { .hero__title { font-size: clamp(1.9rem, 4.1vw, 2.6rem); } }
+@media (max-width: 760px) { .hero__title { font-size: clamp(1.8rem, 7.4vw, 2.4rem); } }
+@media (max-width: 380px) { .hero__title { font-size: 1.7rem; } }
+
+.form--light .form__row--2 { align-items: end; }

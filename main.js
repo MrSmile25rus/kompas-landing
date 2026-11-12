@@ -146,6 +146,22 @@
     return (h ? h + ' ч' : '') + (h && m ? ' ' : '') + (m ? m + ' мин' : '');
   }
 
+  // групповые цены: чем больше участников от организации, тем дешевле каждый
+  function hasTiers(e) { return Array.isArray(e.tiers) && e.tiers.length > 0; }
+  function sortedTiers(e) { return e.tiers.slice().sort(function (a, b) { return a.from - b.from; }); }
+  function minTier(e) { return Math.min.apply(null, e.tiers.map(function (t) { return t.price; })); }
+  function rub(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0') + '\u00a0₽'; }
+  function priceFor(e, count) {
+    var price = sortedTiers(e)[0].price;
+    sortedTiers(e).forEach(function (t) { if (count >= t.from) price = t.price; });
+    return price;
+  }
+  function tiersLabel(e) {
+    return sortedTiers(e).map(function (t, i) {
+      return (i === 0 ? 'до ' + (sortedTiers(e)[1] ? sortedTiers(e)[1].from - 1 : '∞') + ' чел.' : 'от ' + t.from + ' чел.') + ' — ' + rub(t.price);
+    }).join(' · ');
+  }
+
   var now = Date.now();
   var events = (window.EVENTS || [])
     .map(function (e) {
@@ -177,11 +193,13 @@
               '<p class="event__kicker">' + esc(e.type) + ' <span aria-hidden="true">·</span> ' + esc(e.audience) + '</p>' +
               '<h3 class="event__title">' + esc(e.title) + '</h3>' +
               (e.description ? '<p class="event__text">' + esc(e.description) + '</p>' : '') +
+              (e.expert ? '<p class="event__expert">Ведёт: <strong>' + esc(e.expert) + '</strong></p>' : '') +
               '<ul class="event__meta">' +
                 '<li>' + esc(e.platform) + '</li>' +
                 '<li>' + durationLabel(e.duration || 90) + '</li>' +
-                (e.price ? '<li>' + esc(e.price) + '</li>' : '') +
+                (hasTiers(e) ? '<li>от ' + rub(minTier(e)) + ' за участника</li>' : (e.price ? '<li>' + esc(e.price) + '</li>' : '')) +
               '</ul>' +
+              (hasTiers(e) ? '<p class="event__tiers">' + tiersLabel(e) + '</p>' : '') +
             '</div>' +
             '<div class="event__cta">' +
               '<button class="btn btn--dark" type="button" data-register="' + esc(e.id) + '">Хочу участвовать</button>' +
@@ -208,8 +226,9 @@
             location: { '@type': 'VirtualLocation', url: SITE_URL + '#events' },
             image: SITE_URL + 'assets/og-image.jpg',
             organizer: { '@type': 'Person', name: 'Наталья Василянская', url: SITE_URL },
-            performer: { '@type': 'Person', name: 'Наталья Василянская' },
-            offers: free ? { '@type': 'Offer', price: 0, priceCurrency: 'RUB', availability: 'https://schema.org/InStock', url: SITE_URL + '#events' } : undefined
+            performer: e.expert ? { '@type': 'Person', name: e.expert } : { '@type': 'Person', name: 'Наталья Василянская' },
+            offers: free ? { '@type': 'Offer', price: 0, priceCurrency: 'RUB', availability: 'https://schema.org/InStock', url: SITE_URL + '#events' }
+              : hasTiers(e) ? { '@type': 'AggregateOffer', lowPrice: minTier(e), highPrice: Math.max.apply(null, e.tiers.map(function (t) { return t.price; })), priceCurrency: 'RUB', url: SITE_URL + '#events' } : undefined
           };
         })
       });
@@ -591,15 +610,18 @@
     if (!trigger) return;
     e.preventDefault();
     var format = trigger.getAttribute('data-format') || '';
+    var expert = trigger.getAttribute('data-expert') || '';
     if (!leadSuccess.hidden) resetForm(leadForm); // после отправленной заявки — чистая форма
     leadFormWrap.hidden = false; leadSuccess.hidden = true;
-    selectFormat(leadForm.elements.format, format);
-    selectFormat(document.getElementById('f-format'), format);
-    document.getElementById('leadMeta').textContent = format ? 'Заявка · ' + format : 'Заявка';
-    document.getElementById('leadTitle').textContent =
-      format === 'Интенсив' ? 'Запросить программу интенсива' : format ? 'Обсудить формат' : 'Пригласить эксперта';
+    selectFormat(leadForm.elements.format, expert ? 'Индивидуальная консультация' : format);
+    selectFormat(leadForm.elements.expert, expert);
+    selectFormat(document.getElementById('f-format'), expert ? 'Индивидуальная консультация' : format);
+    selectFormat(document.getElementById('f-expert'), expert);
+    document.getElementById('leadMeta').textContent = expert ? 'Консультация · ' + expert : format ? 'Заявка · ' + format : 'Заявка';
+    document.getElementById('leadTitle').textContent = expert ? 'Записаться на консультацию'
+      : format === 'Интенсив' ? 'Запросить программу интенсива' : format ? 'Обсудить формат' : 'Пригласить эксперта';
     openModal(leadDialog);
-    track('lead_open', { format: format || 'не выбран' });
+    track('lead_open', { format: format || 'не выбран', expert: expert || 'не выбран' });
   });
 
   /* =========================================================
@@ -620,10 +642,25 @@
     document.getElementById('evTitle').textContent = currentEvent.title;
     resetForm(evForm);
     evForm.elements.event_id.value = currentEvent.id;
+    var paid = hasTiers(currentEvent);
+    evGroup.hidden = !paid;
+    if (paid) {
+      evForm.elements.participants.value = 1;
+      document.getElementById('evTiers').textContent = 'Групповые цены: ' + tiersLabel(currentEvent);
+      updatePrice();
+    }
     evFormWrap.hidden = false; evSuccess.hidden = true;
     openModal(dialog);
     track('event_open', { event: currentEvent.id });
   }
+
+  var evGroup = document.getElementById('evGroup');
+  function updatePrice() {
+    var n = Math.max(1, parseInt(evForm.elements.participants.value, 10) || 1);
+    var price = priceFor(currentEvent, n);
+    document.getElementById('evPrice').innerHTML = n + ' × ' + rub(price) + ' = <strong>' + rub(n * price) + '</strong>';
+  }
+  evForm.elements.participants.addEventListener('input', function () { if (currentEvent && hasTiers(currentEvent)) updatePrice(); });
 
   document.addEventListener('click', function (e) {
     var b = e.target.closest('[data-register]');
@@ -638,8 +675,16 @@
     var data = serialize(evForm);
     data.event_title = currentEvent.title;
     data.event_date = currentEvent.date;
+    data.expert = currentEvent.expert || 'не указан';
+    if (hasTiers(currentEvent)) {
+      var n = Math.max(1, parseInt(data.participants, 10) || 1);
+      data.price_per_person = priceFor(currentEvent, n);
+      data.total = n * data.price_per_person;
+    } else {
+      delete data.participants;
+    }
     send('event_registration', data).then(function () {
-      track('event_register', { event: currentEvent.id });
+      track('event_register', { event: currentEvent.id, expert: data.expert });
       document.getElementById('evEmail').textContent = data.email;
       evFormWrap.hidden = true; evSuccess.hidden = false; evSuccess.focus();
     }).catch(function () {
